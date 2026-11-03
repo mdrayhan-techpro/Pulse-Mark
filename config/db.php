@@ -58,6 +58,19 @@ function getDB() {
         PDO::ATTR_EMULATE_PREPARES   => false,
     ];
 
+    // TiDB Cloud & Remote Cloud SSL/TLS support
+    $isSsl = (getenv('DB_SSL') === 'true') || ((int)DB_PORT === 4000) || (strpos(DB_HOST, 'tidbcloud.com') !== false);
+    if ($isSsl) {
+        $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+        $caPaths = ['/etc/ssl/certs/ca-certificates.crt', '/etc/pki/tls/certs/ca-bundle.crt'];
+        foreach ($caPaths as $ca) {
+            if (file_exists($ca)) {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = $ca;
+                break;
+            }
+        }
+    }
+
     try {
         $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
         $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);

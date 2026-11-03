@@ -1,7 +1,9 @@
 FROM php:8.2-apache
 
-# Install dependencies and PHP extensions (PDO MySQL, GD)
+# Install dependencies and PHP extensions (PDO MySQL, GD, SSL CA)
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
@@ -31,3 +33,4 @@ RUN chown -R www-data:www-data /var/www/html \
 EXPOSE 80
 
 CMD ["apache2-foreground"]
+
